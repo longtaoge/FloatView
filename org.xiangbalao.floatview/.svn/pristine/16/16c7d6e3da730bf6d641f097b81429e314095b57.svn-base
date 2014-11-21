@@ -1,0 +1,55 @@
+LOCAL_PATH := $(call my-dir)
+#
+#include $(CLEAR_VARS)
+#
+#LOCAL_MODULE    := andspeed
+#LOCAL_SRC_FILES := inject.c shellcode.s
+#LOCAL_CFLAGS           := -sd=c99t -Wno-format -Wno-format-extra-args
+#LOCAL_LDLIBS           := -ldl -llog
+#LOCAL_STATIC_LIBRARIES := libc
+#include $(BUILD_SHARED_LIBRARY)
+#
+
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE    := libhook
+LOCAL_LDLIBS    := -llog
+LOCAL_CFLAGS    := -std=c99 -Wno-format -Wno-format-extra-args
+LOCAL_SRC_FILES := hook.c
+LOCAL_CERTIFICATE := platform
+include $(BUILD_SHARED_LIBRARY)
+
+
+
+include $(CLEAR_VARS)
+
+LOCAL_C_INCLUDES       := $(LOCAL_PATH)
+LOCAL_MODULE           := inject
+LOCAL_LDLIBS           := -ldl -llog
+LOCAL_CFLAGS           := -std=c99 -Wno-format -Wno-format-extra-args
+LOCAL_SRC_FILES        := inject.c shellcode.s
+LOCAL_STATIC_LIBRARIES := libc
+LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
+LOCAL_MODULE_TAGS := debug
+LOCAL_CERTIFICATE := platform
+include $(BUILD_EXECUTABLE)
+
+
+
+
+
+include $(CLEAR_VARS)
+
+LOCAL_C_INCLUDES       := $(LOCAL_PATH)
+LOCAL_MODULE           := recommand
+LOCAL_LDLIBS           := -ldl -llog
+LOCAL_CFLAGS           := -std=c99 -Wno-format -Wno-format-extra-args
+LOCAL_SRC_FILES        := recommand.c 
+LOCAL_STATIC_LIBRARIES := libc
+LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
+LOCAL_MODULE_TAGS := debug
+LOCAL_CERTIFICATE := platform
+include $(BUILD_EXECUTABLE)
+
+

@@ -1,0 +1,44 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_horizontal"
+    android:background="#00000000"
+    tools:context="gamedashi.com_floatView.MainActivity" >
+
+    <LinearLayout
+        android:id="@+id/ll_head_bar"
+        style="@style/header_linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" >
+
+        <Button
+            android:id="@+id/btn_back"
+            style="@style/header_button_back"
+            android:layout_marginLeft="8dip"
+            android:visibility="gone" />
+
+        <TextView
+            style="@style/header_text_view"
+            android:visibility="invisible" />
+
+        <ImageButton
+            android:id="@+id/tz_dtcq_floatview_activity_main_ib_operate_more"
+            style="@style/header_button_operate"
+            android:layout_marginLeft="8dip"
+            android:layout_marginRight="10dip"
+            android:src="@drawable/ico_headbar_more" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/button_copy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/ll_head_bar"
+        android:layout_marginTop="57dp"
+        android:visibility="gone"
+        android:text="button_copy" />
+
+</RelativeLayout>

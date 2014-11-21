@@ -1,0 +1,194 @@
+/**
+ * 
+ */
+package com.gamedashi.dtcq.hookApi;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+
+/**
+ * @ClassName: ADBCommand
+ * @Description: TODO(adb命令执行逻辑类)
+ * @author aibi zhengb@ruijie.com.cn
+ * @date 2013-11-12 下午02:20:28
+ * 
+ */
+public class ADBCommandUtil {
+
+	public static final String SU = "su";
+	public static final String SH = "sh";
+	public static final String PM = "pm";
+
+	/**
+	 * @Title: adbCommandExecDalvikvmRun
+	 * @Description: TODO(执行命令)
+	 * @author aibi
+	 * @return void
+	 */
+	public static CommandResult adbCommandExec(String isRoot, String[] commands, boolean isNeedResultMsg) {
+		int result = -1;
+		if (commands == null || commands.length == 0) {
+			return new CommandResult(result, null, null);
+		}
+		Process process = null;
+		DataOutputStream os = null;
+		BufferedReader successResult = null;
+		BufferedReader errorResult = null;
+		StringBuilder successMsg = null;
+		StringBuilder errorMsg = null;
+
+		try {
+			process = Runtime.getRuntime().exec(isRoot);
+			os = new DataOutputStream(process.getOutputStream());
+			for (String command : commands) {
+				if (command == null) {
+					continue;
+				}
+				os.write(command.getBytes());
+				os.writeBytes("\n");
+				os.flush();
+			}
+			os.writeBytes("exit\n");
+			os.flush();
+			WatchThread sv = new  WatchThread(process);
+			sv.start();
+			result = process.waitFor();
+			ArrayList<String> Commands = sv.getStream();
+			sv.setOver(true);
+
+			int exitCode = process.exitValue();
+	
+			if (isNeedResultMsg) {
+				successMsg = new StringBuilder();
+				errorMsg = new StringBuilder();
+				successResult = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				errorResult = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+				String s;
+				while ((s = successResult.readLine()) != null) {
+					successMsg.append(s);
+				}
+ 
+				while ((s = errorResult.readLine()) != null) {
+					errorMsg.append(s);
+				}
+			}
+		} catch (Exception e) {
+			// LoggerUtil.getSingleton().print(ADBCommandUtil.class,
+			// LoggerUtil.DEBUG, "adbCommandExecDalvikvmRun  Exception  = ", e);
+			// e.printStackTrace();
+			errorMsg.append(e.toString());
+		} finally {
+			try {
+				if (os != null) {
+					os.close();
+				}
+				if (successResult != null) {
+					successResult.close();
+				}
+				if (errorResult != null) {
+					errorResult.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			if (process != null) {
+				process.destroy();
+			}
+		}
+		CommandResult commandResult = new CommandResult(result, successMsg == null ? null : successMsg.toString(), errorMsg == null ? null
+				: errorMsg.toString());
+ 
+		return commandResult;
+	}
+
+	public static class CommandResult {
+
+		public int result;
+		public String successMsg;
+		public String errorMsg;
+
+		public CommandResult(int result) {
+			this.result = result;
+		}
+
+		public CommandResult(int result, String successMsg, String errorMsg) {
+			this.result = result;
+			this.successMsg = successMsg;
+			this.errorMsg = errorMsg;
+		}
+	}
+
+	public static List<String> performCommand(String[] cmdAttribs, int max) throws IOException {
+		// this method does what it can to avoid the 'Too many open files' error
+		// based on trial and error and these links:
+		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4784692
+		// http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4801027
+		// http://forum.java.sun.com/thread.jspa?threadID=533029&messageID=2572018
+		// however, its still not perfect as the JDK support is so poor
+		// (see commond-exec or ant for a better multi-threaded multi-os
+		// solution)
+
+		List<String> lines = new ArrayList<String>(20);
+		Process proc = null;
+		InputStream in = null;
+		OutputStream out = null;
+		InputStream err = null;
+		BufferedReader inr = null;
+		try {
+			proc = openProcess(cmdAttribs);
+			in = proc.getInputStream();
+			out = proc.getOutputStream();
+			err = proc.getErrorStream();
+			inr = new BufferedReader(new InputStreamReader(in));
+			String line = inr.readLine();
+			while (line != null && lines.size() < max) {
+				line = line.toLowerCase().trim();
+				lines.add(line);
+				line = inr.readLine();
+			}
+
+			proc.waitFor();
+			if (proc.exitValue() != 0) {
+				// os command problem, throw exception
+				throw new IOException("Command line returned OS error code '" + proc.exitValue() + "' for command " + Arrays.asList(cmdAttribs));
+			}
+			if (lines.size() == 0) {
+				// unknown problem, throw exception
+				throw new IOException("Command line did not return any info " + "for command " + Arrays.asList(cmdAttribs));
+			}
+			return lines;
+
+		} catch (InterruptedException ex) {
+			throw new IOException("Command line threw an InterruptedException '" + ex.getMessage() + "' for command " + Arrays.asList(cmdAttribs));
+		} finally {
+			if (in != null) {
+				in.close();
+			}
+			if (out != null) {
+				out.close();
+			}
+			if (err != null) {
+				err.close();
+			}
+			if (inr != null) {
+				inr.close();
+			}
+			if (proc != null) {
+				proc.destroy();
+			}
+		}
+	}
+
+	static Process openProcess(String[] cmdAttribs) throws IOException {
+		return Runtime.getRuntime().exec(cmdAttribs);
+	}
+}

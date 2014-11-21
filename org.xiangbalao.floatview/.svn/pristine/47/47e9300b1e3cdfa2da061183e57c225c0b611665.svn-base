@@ -1,0 +1,290 @@
+package com.gamedashi.dtcq.hookApi;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+import android.content.Context;
+import android.content.res.AssetManager;
+import android.util.Log;
+
+public class RequestDownloadAddress {
+	public String _appid;
+	public Context _context;
+	public String _version;
+	public float process;
+	//1为请求下载地址   2为请求失败  3为开始下载文件 4为下载失败  5为替换文件成功
+	public int state;
+	//0为不换肤 1为换肤
+	public int _type;
+	public RequestDownloadAddress(String Appid,Context context,int type){
+		_appid = Appid;
+		_context = context;
+		process = 0;
+		state = 1;
+		Log.e("download", "type is "+_type);
+		_type =type;
+	}
+	
+	//请求服务器 获取需要 下载 文件
+	public String executePost() { 
+		String result = null; 
+
+		BufferedReader reader = null; 
+		try { 
+
+				HttpClient client = new DefaultHttpClient(); 
+
+	            HttpPost request = new HttpPost(); 
+
+	            request.setURI(new URI("http://dtcq.gamedashi.com/api/zs_awake_all/")); 
+
+	            List<NameValuePair> postParameters = new ArrayList<NameValuePair>(); 
+
+	            postParameters.add(new BasicNameValuePair("bundleid", _appid)); 
+
+	            UrlEncodedFormEntity formEntity = new UrlEncodedFormEntity(postParameters); 
+
+	            request.setEntity(formEntity); 
+
+	            HttpResponse response = client.execute(request); 
+
+	            reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent())); 
+
+	            StringBuffer strBuffer = new StringBuffer(""); 
+
+	            String line = null; 
+
+	            while ((line = reader.readLine()) != null) { 
+
+	                strBuffer.append(line); 
+
+	            } 
+
+	            result = strBuffer.toString(); 
+	        	Log.d("result", "result: " + result);
+	    		
+	        } catch (Exception e) { 
+
+	            e.printStackTrace(); 
+
+	        } finally { 
+
+	            if (reader != null) { 
+
+	                try { 
+
+	                    reader.close(); 
+
+	                    reader = null; 
+
+	                } catch (IOException e) { 
+
+	                    e.printStackTrace(); 
+	                } 
+
+	            } 
+
+	        } 
+		
+			JSONObject s;
+			try {
+				s = new JSONObject(result);
+				if((s.getString("code")+"").equals("0")){
+					
+					String Url  = s.getString("url");
+					
+					_version = s.getString("version");
+					
+					downloadAllAssets(Url);
+					
+				}else{
+					state = 2;
+					
+				}
+				
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				state= 2;
+			}	
+	
+	        return result; 
+	    } 
+	//开始现在文件
+	private void downloadAllAssets( String urls ) {
+		
+		state =3;
+		File zipDir = new File(_context.getFilesDir().getPath()+"/tmp");
+		
+		
+		
+		if(!zipDir.exists()){
+			zipDir.mkdirs();
+		}else{
+			zipDir.delete();
+			zipDir.mkdirs();
+		}
+		
+		
+		// File path to store .zip file before unzipping
+		File zipFile = new File( zipDir.getPath() + "/temp.zip" );
+		// Folder to hold unzipped output
+		File outputDir = new File(_context.getFilesDir().getPath()+"/heros");
+	
+		if(zipFile.exists()){
+			
+			unzipFile( zipFile, outputDir,_type );
+			
+		}else{
+			
+			if(!outputDir.exists()){
+				
+				outputDir.mkdirs();
+			}
+			
+	  		try {
+	  		
+	  			URL url = new URL(urls);
+	            //打开连接
+	            URLConnection con = url.openConnection();
+	            //获得文件的长度
+	            int contentLength = con.getContentLength();
+	            //System.out.println("长度 :"+contentLength);
+	            //输入流
+	            InputStream is = con.getInputStream();
+	            //1K的数据缓冲
+	            byte[] bs = new byte[1024];
+	            //读取到的数据长度
+	            int len;
+	            //输出的文件流
+	            OutputStream os = new FileOutputStream(zipFile);
+	            //开始读取
+	            int total = 0;
+	            while ((len = is.read(bs)) != -1) {
+	                os.write(bs, 0, len);
+	                total+=len;
+	                if(contentLength ==0){
+	                	process = 0;
+	                }else{
+	                	  
+	                    process = (float) ((total*1.0)/(contentLength*1.0)*100.f);
+	                }
+	            	Log.e("download", "totalsize "+process);
+	      		
+	            }
+	            //完毕，关闭所有链接
+	            os.close();
+	            is.close();
+	  		
+				unzipFile( zipFile, outputDir,_type);
+				
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				zipFile.delete();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				zipFile.delete();
+			} finally {
+				
+			}
+		}	
+	}
+	
+	//根据 类型解压文件 获取shell 脚本
+	protected void unzipFile( File zipFile, File destination ,int type) {
+		
+		DecompressZip decomp = new DecompressZip( zipFile.getPath(), 
+				 destination.getPath() + File.separator ,"/data/data/"+_appid+"/files/"+_version+"/patch/",type);
+		
+		String shell = decomp.unzip();
+		
+		FileManager.contentToTxt(_context.getFilesDir().getPath()+"/shell.txt", shell);
+		
+		Log.d("Decompress", "start " +shell );
+		
+		startRoot("recommand");		
+	}
+	
+	
+	//把可执行文件拿出来
+	private  void transferFiles(String filename) {
+		AssetManager assetManager = _context.getAssets();
+		try {
+			String path = _context.getFilesDir() + "/";
+			File file = new File(path + filename);
+			File data = new File(_context.getPackageCodePath());
+			if (file.exists() && (file.lastModified() > data.lastModified())) {
+				return;
+			}
+			FileOutputStream fos = new FileOutputStream(path + filename);
+			InputStream inputStream = assetManager.open(filename);
+			byte[] buffer = new byte[8192];
+			int count = 0;
+			while ((count = inputStream.read(buffer)) != -1) {
+				fos.write(buffer, 0, count);
+			}
+			fos.flush();
+			fos.close();
+			inputStream.close();
+		} catch (IOException e) {
+			Log.e("w", "transfer files failed", e);
+		} catch (Exception e) {
+			Log.e("w", "transfer files failed", e);
+		}
+	}
+	
+	//开始root 复制文件
+	private  void startRoot(String names) {
+		this.transferFiles(names);
+		String filepath = _context.getFilesDir().getPath() + "/";
+		String chmods = "chmod 777 " + filepath + "shell.txt" + " \n";
+
+		String chmod = "chmod 777 " + filepath + names + " \n";
+
+		String cmd = "su -c " + filepath + names;
+		Log.d("Decompress", "start " +cmd+ chmod );
+		 
+
+		ADBCommandUtil.adbCommandExec(ADBCommandUtil.SU, new String[] {chmods,chmod,cmd}, false);
+		
+		
+		Log.e("w", "ROOT SUcess");
+	
+		state = 5;
+	}
+}

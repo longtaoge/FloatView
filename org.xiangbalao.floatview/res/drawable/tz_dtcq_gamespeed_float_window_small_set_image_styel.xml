@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:drawable="@drawable/tz_dtcq_gamespeed_float_window_small_set_image_set" android:state_pressed="true"></item>
+    <item android:drawable="@drawable/tz_dtcq_gamespeed_float_window_small_set_image_set" android:state_checked="true"></item>
+    <item android:drawable="@drawable/tz_dtcq_gamespeed_float_window_small_set_image_set" android:state_selected="true"></item>
+    <item android:drawable="@drawable/tz_dtcq_gamespeed_float_window_small_set_image_set_def" android:state_selected="false"></item>
+    <item android:drawable="@drawable/tz_dtcq_gamespeed_float_window_small_set_image_set_def"/>
+
+</selector>

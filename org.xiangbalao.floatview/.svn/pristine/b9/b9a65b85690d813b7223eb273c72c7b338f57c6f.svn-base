@@ -1,0 +1,592 @@
+#include <pthread.h>
+#include <unistd.h>
+#include <android/log.h>
+#include <linux/elf.h>
+#include <dlfcn.h>
+#include <stdlib.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include<jni.h>
+#include <unistd.h>
+#include <android/log.h>
+#include <stdio.h>
+
+#include <string.h>
+#include <stdio.h>
+#include <arpa/inet.h>
+#include<unistd.h>
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+// multi_thread_client.c
+///////////////////////////////////////////////////////////////////////////////////
+//本文件是客户机多线程多次重复与服务交互的代码
+#include <netinet/in.h>    // for sockaddr_in
+#include <sys/types.h>    // for socket
+#include <sys/socket.h>    // for socket
+#include <stdio.h>        // for LOGD
+#include <stdlib.h>        // for exit
+#include <string.h>        // for bzero
+#include <pthread.h>
+#include <sys/errno.h>    // for errno
+#define HELLO_WORLD_SERVER_PORT 7676
+#define SERVERIP "127.0.0.1"
+#define MAXDATASIZE 1024
+#define ANDROID_ARM_LINKER
+#define SOINFO_NAME_LEN 128
+
+#define Hooklink "/system/lib/libc.so"
+
+
+struct link_map {
+    uintptr_t l_addr;
+    char *l_name;
+    uintptr_t l_ld;
+    struct link_map *l_next;
+    struct link_map *l_prev;
+};
+
+
+typedef struct soinfo soinfo;
+struct soinfo {
+    const char name[SOINFO_NAME_LEN];
+    Elf32_Phdr *phdr;
+    //0x80
+    int phnum; //0x84
+    unsigned entry;
+    //0x88
+    unsigned base;
+    //0x8c
+    unsigned size;
+    //0x90
+    // buddy-allocator index, negative for prelinked libraries
+    int ba_index;//0x94
+
+    unsigned *dynamic;//0x98
+
+    unsigned wrprotect_start;
+    //0x9c
+    unsigned wrprotect_end;//0xa0
+
+    soinfo *next;
+    //0xa4
+    unsigned flags;//0xa8
+
+    const char *strtab;
+    //0xac
+    Elf32_Sym *symtab;//0xb0
+
+    unsigned nbucket;
+    //0xb4
+    unsigned nchain;
+    //0xb8
+    unsigned *bucket;
+    //0xbc
+    unsigned *chain;//0xc0
+
+    unsigned *plt_got;//0xc4
+
+    Elf32_Rel *plt_rel;
+    //0xc8
+    unsigned plt_rel_count;//0xcc
+
+    Elf32_Rel *rel;
+    //0xd0
+    unsigned rel_count;//0xd4
+
+#ifdef ANDROID_SH_LINKER
+    Elf32_Rela *plt_rela;
+    unsigned plt_rela_count;
+
+    Elf32_Rela *rela;
+    unsigned rela_count;
+#endif /* ANDROID_SH_LINKER */
+
+    unsigned *preinit_array;
+    unsigned preinit_array_count;
+
+    unsigned *init_array;
+    unsigned init_array_count;
+    unsigned *fini_array;
+    unsigned fini_array_count;
+
+    void (*init_func)(void);
+
+    void (*fini_func)(void);
+
+#ifdef ANDROID_ARM_LINKER
+    /* ARM EABI section used for stack unwinding. */
+    unsigned *ARM_exidx;
+    unsigned ARM_exidx_count;
+#endif
+
+    unsigned refcount;
+    struct link_map linkmap;
+
+    Elf32_Addr load_bias;
+};
+/* Log information onto the tombstone */
+//extern __start;
+static pthread_mutex_t dl_lock = PTHREAD_MUTEX_INITIALIZER;
+//0x28
+static void *dlsym_symbol = NULL;
+//0x2c
+static void *dlopen_symbol = NULL;
+static soinfo *libdl_info = NULL;
+static soinfo *myself_info = NULL;//0x38
+
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, "hook-lib", __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "hook-lib", __VA_ARGS__)
+
+void hook_process();
+
+
+static char* charType;
+static char* charValue ;
+static char* charabcValue ;
+static char* charabcType ;
+
+static long runold = 0;
+static long rusold = 0;
+
+static long lostrunold = 0;
+static long lostrusold = 0;
+
+static long long dif = 0;
+
+static float speed = 1;
+static float speednew = 1;
+static long lostdif = 0;
+static long long begin = 0;
+static int firstRun = 0;
+static int counts = 0;
+static char *vas= "";
+//
+
+
+
+int redfile(char* filepath){
+	FILE *fp=NULL;
+	char a;
+	fp=fopen(filepath,"r");
+
+	if(fp == NULL){
+
+		return 0;
+	}else{
+
+		fclose(fp);
+		return 1;
+	}
+
+
+
+ return a;
+}
+
+
+static int	mygettimeofday(struct timeval *  statu, void * sss){
+
+
+	int y=gettimeofday(statu,sss);
+	//如果  刚开始
+	if (begin == 0) {
+		//如果第一次
+		if (runold ==0 &&rusold ==0 ) {
+			//she在开始时间
+			begin = 1000000 * (*statu).tv_sec+ (*statu).tv_usec;
+			//she在开始秒速
+
+			runold =(*statu).tv_sec;
+			//she在开始微妙
+			rusold =(*statu).tv_usec;
+
+			lostrunold =runold;
+
+			lostrusold =rusold;
+
+		}else {
+			//获取当前时间 秒速 和 当前时间微妙 *100000的差值
+			//��ȡ���ʼʱ��ļ��
+			long long outtime =( (*statu).tv_sec -lostrunold)*1000000 +(*statu).tv_usec -lostrusold;
+			//设置offset
+
+			dif = outtime;
+
+			//设置最后 一次
+			runold =lostrunold;
+			//she在最后一次秒速`
+			rusold =lostrusold;
+
+			begin =1;
+
+			(*statu).tv_sec = lostrunold;
+				//设置最后的微秒
+			(*statu).tv_usec=	lostrusold ;
+
+
+
+			return y;
+		}
+
+	}else{
+
+		//��ȡ��ǰʱ�� ����
+		long long run =(*statu).tv_sec;
+		//��ȡ��ǰ��΢��
+		long  long rus = (*statu).tv_usec;
+		//如果 时间为加速
+
+
+		if (dif < 0) {
+			//获取当前time
+			long long time =((run)*1000000 +rus)-dif;
+			//设置时间差秒
+			run =(long long)(time/1000000);
+			//设置时间差微妙
+			rus =time - 1000000*run;
+
+		}
+
+		//��ȡ���ʼʱ��ļ��
+		long long outtime =((run -runold)*1000000 +rus -rusold)*speed;
+
+		int x =(int)(outtime/1000000);
+
+		//���÷��ظ��ͻ�������
+		(*statu).tv_sec =  runold+x ;
+		//���÷��ظ��ͻ���΢��
+		(*statu).tv_usec =rusold +outtime  - 1000000*x;
+		//设置最后的秒
+		lostrunold =(*statu).tv_sec;
+		//设置最后的微秒
+		lostrusold =(*statu).tv_usec;
+
+
+
+
+	}
+
+	if(speednew != speed){
+
+		speed = speednew;
+		begin = 0;
+
+	}
+	return y;
+}
+
+static int hook_func(const char *library, const char *symname, void *newEntry) {
+    void *handle = NULL;
+    void *symbol = NULL;
+    static soinfo *current = NULL;
+
+    LOGD("Try to hook %s in %s\n", symname, library);
+    handle = dlopen(library, RTLD_NOW);
+
+    if (handle == NULL) {
+        LOGD("Open %s library error: %s\n", library, dlerror());
+        return 0;
+    }
+    symbol = dlsym(handle, symname);
+    if (symbol == NULL) {
+        LOGD("Get symbol %s error in %s: %s\n", symname, library, dlerror());
+        return 0;
+    }
+    //pthread_mutel_lock(&dl_lock);
+    if (libdl_info == NULL)
+        libdl_info = dlopen(Hooklink, RTLD_NOW);
+    if (libdl_info == NULL) {
+        LOGD("open libdl.so error: %s \n", dlerror());
+        return 0;
+    }
+
+    //find myself
+    for (current = libdl_info; current != NULL; current = current->next) {
+        if ((hook_process >= current->base) && (hook_process < (current->base + current->size))) {
+            LOGD("Found myself %s \n", current->name);
+
+            myself_info = current;
+            break;
+        }
+    }
+
+
+    //to hook every so
+    for (current = libdl_info; current != NULL; current = current->next) {
+        LOGD("Processing %s\n", current->name);
+
+        if (strcmp(current->name, "libhellolua.so") != 0) {
+//            LOGD("diff %s\n", current->name);
+
+            continue;
+        }
+        LOGD("eque %s\n", current->name);
+
+        if (current == myself_info) {
+            LOGD("Skip myself\n");
+            continue;
+        }
+
+        if (msync(current->base, current->size, MS_ASYNC) < 0) {
+            LOGD("%s ,msync failed, base:%p, size:%d\n", current->name, current->base, current->size);
+            if (current->base != 0) {
+                continue;
+            }
+        }
+        if (current->rel) {
+            const char *strtab = current->strtab;
+            Elf32_Sym *symtab = current->symtab;
+            Elf32_Rel *rel = current->rel;
+            unsigned rel_count = current->rel_count;
+            LOGD("rel %p , rel_count %d\n", rel, rel_count);
+            int idx = 0;
+            for (idx = 0; idx < rel_count; idx++) {
+                unsigned type = ELF32_R_TYPE(rel->r_info);
+                unsigned sym = ELF32_R_SYM(rel->r_info);
+                unsigned reloc = (unsigned) (rel->r_offset + current->base);
+                char *sym_name = NULL;
+
+                if (sym != 0) {
+
+                    sym_name = (char *) (strtab + symtab[sym].st_name);
+
+                    if (strcmp(sym_name, symname) == 0) {
+                        LOGD("Hook ref %s, symbol %s, type %d, old addr %p, new addr %p \n", current->name, symname, type, *((unsigned *) reloc), newEntry);
+                        *((unsigned *) reloc) = newEntry;
+                        LOGD("Hook ref");
+
+                    }
+                }
+                rel++;
+            }
+
+        }
+        if (current->plt_rel) {
+            const char *strtab = current->strtab;
+            Elf32_Sym *symtab = current->symtab;
+
+            Elf32_Rel *plt_rel = current->plt_rel;
+            unsigned plt_rel_count = current->plt_rel_count;
+            LOGD("plt_rel %p , plt_rel_count %d\n", plt_rel, plt_rel_count);
+            int idx = 0;
+            for (idx = 0; idx < plt_rel_count; idx++) {
+                unsigned type = ELF32_R_TYPE(plt_rel->r_info);
+                unsigned sym = ELF32_R_SYM(plt_rel->r_info);
+                unsigned reloc = (unsigned) (plt_rel->r_offset + current->base);
+                char *sym_name = NULL;
+
+                if (sym != 0) {
+                    sym_name = (char *) (strtab + symtab[sym].st_name);
+                    if (strcmp(sym_name, symname) == 0) {
+                        LOGD("Hook plt_rel %s, symbol %s, type %d, old addr %p, new addr %p \n", current->name, symname, type, *((unsigned *) reloc), newEntry);
+                        uint32_t page_size = getpagesize();
+                        mprotect((uint32_t *)(reloc / page_size * page_size), page_size, PROT_READ | PROT_WRITE);
+                        *((unsigned *) reloc) = newEntry;
+                        LOGD("Hook plt_rel");
+                    }
+                }
+                plt_rel++;
+            }
+        }
+
+        if (current->rel == NULL && current->plt_rel == NULL && current->dynamic != NULL) {
+            Elf32_Rel *plt_rel_start = NULL;
+            unsigned plt_rel_count = 0;
+            Elf32_Rel *rel_start = NULL;
+            unsigned rel_count = 0;
+            unsigned *d = NULL;
+            LOGD("The %s have not been relocated???????\n", current->name);
+            for (d = current->dynamic; *d; d++) {
+                switch (*d++) {
+                    case DT_JMPREL:
+                        plt_rel_start = (Elf32_Rel *) (current->base + *d);
+                        LOGD("Found plt_rel in %s \n", current->name);
+                        break;
+                    case DT_PLTRELSZ:
+                        plt_rel_count = *d / 8;
+                        break;
+                    case DT_REL:
+                        rel_start = (Elf32_Rel *) (current->base + *d);
+                        LOGD("Found rel in %s \n", current->name);
+                        break;
+                    case DT_RELSZ:
+                        rel_count = *d / 8;
+                        break;
+                }
+            }
+            if (rel_start != NULL && rel_count > 0) {
+                Elf32_Sym *symtab = current->symtab;
+                const char *strtab = current->strtab;
+                Elf32_Rel *rel = rel_start;
+                int idx = 0;
+                LOGD("rel %p , rel_count %d\n", rel, rel_count);
+                for (idx = 0; idx < rel_count; idx++) {
+                    unsigned type = ELF32_R_TYPE(rel->r_info);
+                    unsigned sym = ELF32_R_SYM(rel->r_info);
+                    unsigned reloc = (unsigned) (rel->r_offset + current->base);
+                    unsigned sym_addr = 0;
+                    char *sym_name = NULL;
+
+                    if (sym != 0) {
+                        sym_name = (char *) (strtab + symtab[sym].st_name);
+
+                        if (strcmp(sym_name, symname) == 0) {
+                            LOGD("Hook dynamic %s, symbol %s, type %d, old addr %p, new addr %p \n", current->name, symname, type, *((unsigned *) reloc), newEntry);
+                            *((unsigned *) reloc) = newEntry;
+                            LOGD("Hook dynamic");
+                        }
+                    }
+                    rel++;
+                }
+            }
+
+            if (plt_rel_start != NULL && plt_rel_count > 0) {
+                LOGD("plt_rel %p , plt_rel_count %d\n", plt_rel_start, plt_rel_count);
+                const char *strtab = current->strtab;
+                Elf32_Sym *symtab = current->symtab;
+                Elf32_Rel *plt_rel = plt_rel_start;
+                int idx = 0;
+                for (idx = 0; idx < plt_rel_count; idx++) {
+                    unsigned type = ELF32_R_TYPE(plt_rel->r_info);
+                    unsigned sym = ELF32_R_SYM(plt_rel->r_info);
+                    unsigned reloc = (unsigned) (plt_rel->r_offset + current->base);
+                    unsigned sym_addr = 0;
+                    char *sym_name = NULL;
+
+                    if (sym != 0) {
+                        sym_name = (char *) (strtab + symtab[sym].st_name);
+                        if (strcmp(sym_name, symname) == 0) {
+                            LOGD("Hook %s, symbol %s, type %d, old addr %p, new addr %p \n", current->name, symname, type, *((unsigned *) reloc), newEntry);
+                            LOGD("Hook  plt_rel_start");
+
+                            *((unsigned *) reloc) = newEntry;
+                        }
+                    }
+                    plt_rel++;
+                }
+            }
+        }
+    }
+}
+
+
+
+static void *thread_func(void *arg) {
+
+    hook_func("/system/lib/libc.so", "gettimeofday", mygettimeofday);
+
+}
+
+
+void hook_process() {
+    pthread_t thread;
+    pthread_create(&thread, NULL, thread_func, NULL);
+
+}
+
+
+void setSpeed(char * speeds) {
+
+	 LOGD("Hook success %s\n",speeds);
+
+	if(strstr(speeds,"exit")!= NULL){
+
+
+		 LOGD("exit  %s\n",speeds);
+
+
+	}else{
+		speednew = atof(speeds);
+	}
+
+
+}
+
+
+int isExit = 1;
+void * talk_to_server(void * thread_num)
+{
+	//设置一个socket地址结构client_addr,代表客户机internet地址, 端口
+	while (isExit==1) {
+
+		usleep(100000);
+	    char buf[ MAXDATASIZE] ;
+		int sockfd, numbytes;
+		struct sockaddr_in server_addr;
+		if ( ( sockfd = socket ( AF_INET , SOCK_STREAM , 0) ) == - 1) {
+			LOGD ( "socket error" ) ;
+			continue;
+		}
+		memset ( & server_addr, 0, sizeof ( struct sockaddr ) ) ;
+		server_addr. sin_family = AF_INET ;
+		server_addr. sin_port = htons ( HELLO_WORLD_SERVER_PORT) ;
+		server_addr. sin_addr. s_addr = inet_addr( SERVERIP) ;
+
+		if ( connect ( sockfd, ( struct sockaddr * ) & server_addr, sizeof ( struct sockaddr ) ) == - 1) {
+
+			LOGD ( "connect error" ) ;
+
+			continue;
+		}
+
+		if ( send ( sockfd, "Hello, world!" , 14, 0) == - 1) {
+
+			LOGD ( "send error" ) ;
+
+			continue;
+		}
+
+		if ( ( numbytes = recv ( sockfd, buf, MAXDATASIZE, 0) ) == - 1) {
+			LOGD ( "recv error" ) ;
+			continue;
+		}
+
+		if ( numbytes) {
+
+			buf[ numbytes] = '/0' ;
+			if(strstr(buf,"exit" )!= NULL){
+				close ( sockfd) ;
+			 	exit(0);
+				break;
+			}else{
+
+				setSpeed(buf);
+
+			}
+
+
+		}
+		close ( sockfd) ;
+	}
+
+    pthread_exit(NULL);
+
+}
+
+
+int my_so_entry(char *a) {
+
+	if (counts == 0){
+		pthread_t child_thread;
+		    pthread_attr_t child_thread_attr;
+		    pthread_attr_init(&child_thread_attr);
+		    pthread_attr_setdetachstate(&child_thread_attr,PTHREAD_CREATE_DETACHED);
+			pthread_create(&child_thread,&child_thread_attr,talk_to_server,    (void *)1);
+
+		counts =  1;
+
+		LOGD("Start hooking %s",a);
+
+	    hook_process();
+
+	    LOGD("Hook success\n");
+
+	}else{
+
+
+	}
+
+    return 0;
+}

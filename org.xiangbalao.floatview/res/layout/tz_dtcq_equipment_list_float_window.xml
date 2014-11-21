@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:layout_margin="10dip"
+    android:background="#FEC923"
+    android:orientation="vertical"
+    android:padding="1.5dip" >
+
+    <RelativeLayout
+        android:id="@+id/big_window_layout_content"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="#160900"
+        android:gravity="center" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="#1A1B1B"
+                android:orientation="horizontal"
+                android:paddingLeft="5dip" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="10dip"
+                    android:paddingTop="10dip"
+                    android:text="稀有度:"
+                    android:textColor="#00AFFF"
+                    android:textSize="15dip" />
+
+                <HorizontalScrollView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@null"
+                    android:gravity="center_horizontal"
+                    android:scrollbars="none" >
+
+                    <RadioGroup
+                        android:id="@+id/tz_dtcq_equipment_list_float_window_color_radioGroup1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        android:background="#1A1B1B"
+                        android:gravity="center_horizontal"
+                        android:orientation="horizontal"
+                        android:paddingBottom="10dip"
+                        android:paddingTop="10dip" >
+
+                        <RadioButton
+                            android:id="@+id/tz_dtcq_equipment_list_float_window_color_radioGroup1_button1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="15dip"
+                            android:layout_marginRight="15dip"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:button="@null"
+                            android:checked="true"
+                            android:ems="2"
+                            android:gravity="center"
+                            android:text="全部"
+                            android:textColor="@drawable/tz_activity_equipment_list_title_text_styel"
+                            android:textSize="15dip" />
+
+                        <RadioButton
+                            android:id="@+id/tz_dtcq_equipment_list_float_window_color_radioGroup1_button2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginRight="15dip"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:button="@null"
+                            android:ems="2"
+                            android:gravity="center"
+                            android:text="橙色"
+                            android:textColor="@drawable/tz_activity_equipment_list_title_text_styel"
+                            android:textSize="15dip" />
+
+                        <RadioButton
+                            android:id="@+id/tz_dtcq_equipment_list_float_window_color_radioGroup1_button3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="15dip"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:button="@null"
+                            android:ems="3"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text="紫色"
+                            android:textColor="@drawable/tz_activity_equipment_list_title_text_styel"
+                            android:textSize="15dip" />
+
+                        <RadioButton
+                            android:id="@+id/tz_dtcq_equipment_list_float_window_color_radioGroup1_button4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="15dip"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:button="@null"
+                            android:ems="2"
+                            android:gravity="center"
+                            android:text="蓝色"
+                            android:textColor="@drawable/tz_activity_equipment_list_title_text_styel"
+                            android:textSize="15dip" />
+
+                        <RadioButton
+                            android:id="@+id/tz_dtcq_equipment_list_float_window_color_radioGroup1_button5"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="15dip"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:button="@null"
+                            android:ems="3"
+                            android:gravity="center"
+                            android:text="绿色"
+                            android:textColor="@drawable/tz_activity_equipment_list_title_text_styel"
+                            android:textSize="15dip" />
+
+                        <RadioButton
+                            android:id="@+id/tz_dtcq_equipment_list_float_window_color_radioGroup1_button6"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="15dip"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:button="@null"
+                            android:ems="3"
+                            android:gravity="center"
+                            android:text="白色"
+                            android:textColor="@drawable/tz_activity_equipment_list_title_text_styel"
+                            android:textSize="15dip" />
+                    </RadioGroup>
+                </HorizontalScrollView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="#1A1B1B"
+                android:orientation="horizontal"
+                android:paddingLeft="5dip" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="10dip"
+                    android:paddingTop="10dip"
+                    android:text=" 类\t型:"
+                    android:textColor="#00AFFF"
+                    android:textSize="15dip" />
+
+                <HorizontalScrollView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@null"
+                    android:gravity="center_horizontal"
+                    android:scrollbars="none" >
+
+                    <RadioGroup
+                        android:id="@+id/tz_dtcq_equipment_list_float_window_color_radioGroup2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        android:background="#1A1B1B"
+                        android:gravity="center_horizontal"
+                        android:orientation="horizontal"
+                        android:paddingBottom="10dip"
+                        android:paddingTop="10dip" >
+
+                        <RadioButton
+                            android:id="@+id/tz_dtcq_equipment_list_float_window_color_radioGroup2_button1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="15dip"
+                            android:layout_marginRight="15dip"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:button="@null"
+                            android:checked="true"
+                            android:ems="2"
+                            android:gravity="center"
+                            android:text="全部"
+                            android:textColor="@drawable/tz_activity_equipment_list_title_text_styel"
+                            android:textSize="15dip" />
+
+                        <RadioButton
+                            android:id="@+id/tz_dtcq_equipment_list_float_window_color_radioGroup2_button2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginRight="15dip"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:button="@null"
+                            android:ems="2"
+                            android:gravity="center"
+                            android:text="零件"
+                            android:textColor="@drawable/tz_activity_equipment_list_title_text_styel"
+                            android:textSize="15dip" />
+
+                        <RadioButton
+                            android:id="@+id/tz_dtcq_equipment_list_float_window_color_radioGroup2_button3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="15dip"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:button="@null"
+                            android:ems="3"
+                            android:gravity="center"
+                            android:singleLine="true"
+                            android:text="合成品"
+                            android:textColor="@drawable/tz_activity_equipment_list_title_text_styel"
+                            android:textSize="15dip" />
+
+                        <RadioButton
+                            android:id="@+id/tz_dtcq_equipment_list_float_window_color_radioGroup2_button4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="15dip"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:button="@null"
+                            android:ems="2"
+                            android:gravity="center"
+                            android:text="卷轴"
+                            android:textColor="@drawable/tz_activity_equipment_list_title_text_styel"
+                            android:textSize="15dip" />
+
+                        <RadioButton
+                            android:id="@+id/tz_dtcq_equipment_list_float_window_color_radioGroup2_button5"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="15dip"
+                            android:layout_weight="1"
+                            android:background="@null"
+                            android:button="@null"
+                            android:ems="3"
+                            android:gravity="center"
+                            android:text="消耗品"
+                            android:textColor="@drawable/tz_activity_equipment_list_title_text_styel"
+                            android:textSize="15dip" />
+                    </RadioGroup>
+                </HorizontalScrollView>
+            </LinearLayout>
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/tz_dtcq_equipment_list_float_window_viewpager"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <GridView
+                    android:id="@+id/tz_dtcq_equipment_list_float_window_gridView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:numColumns="7" >
+                </GridView>
+            </LinearLayout>
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/tz_dtcq_equip_list_float_window_listview_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/tz_dtcq_float_window_close1" />
+    </RelativeLayout>
+
+</LinearLayout>

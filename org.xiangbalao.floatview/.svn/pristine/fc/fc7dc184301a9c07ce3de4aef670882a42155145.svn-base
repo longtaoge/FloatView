@@ -1,0 +1,86 @@
+package com.gamedashi.dtcq.hookApi;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+import android.util.Log;
+
+public class MyThread extends Thread{
+	  
+	 public void run(){
+		
+ 			
+			try {
+				MyThread.openSocket();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
+	 }
+	 public static int portNo = 7676;
+	 public static String  speed = "1.0";
+	 public static String  exitString = "";
+	 public static void openSocket() throws IOException
+     {
+            ServerSocket s = new ServerSocket(portNo);
+          
+            Log.d("socket_ss", "The Server is start: " + s);
+            // 阻塞,直到有客户端连接
+            
+            while(true){
+            	try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            
+            	try {              
+            		 Socket socket = s.accept();
+                    //设置IO句柄
+                  
+                    Log.d("socket_ss", "Accept the Client: " + socket);
+                                  
+                    OutputStream output = socket.getOutputStream();
+                 	if(exitString.length()!=0){
+                        output.write(exitString.getBytes("GBK"));
+                        exitString = "";
+                 	}else{
+                        output.write(speed.getBytes("GBK"));
+                 	}
+    
+                 	
+                    output.flush();
+                    
+                    InputStream input=socket.getInputStream();
+                   
+                    BufferedReader in = new BufferedReader(new InputStreamReader(input));
+                
+                    String str = in.readLine();
+      
+                    socket.close();
+                          
+                    Log.d("socket_ss","In Server reveived the info: " + str);
+      
+
+             	}  finally  {
+             		
+             		Log.d("socket_ss","close the Server socket and the io.");
+
+ 
+               }
+            
+            	
+            }
+            
+     } 
+}

@@ -1,0 +1,83 @@
+package com.gamedashi.dtcq.hookApi;
+
+import java.io.File;
+
+import android.app.Activity;
+import android.content.Context;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+public class HookAPI extends Activity {
+
+	/**
+	 * This is the beginning of injection, we only support system_server process
+	 * and application process here.
+	 * 
+	 * @param hoookPackageid  需要hook的项目的packageid
+	 * 			Context   系统context
+	 * 			isForce   是否强制hook
+	 *            
+	 */
+	static String packageids ="";
+	
+	static Context theContext ;
+	
+ 
+	public static void startHook( String hoookPackageid ,Context obj ,boolean isForce) {
+		theContext = obj;
+		
+		packageids = hoookPackageid;
+		if(isForce){
+			Injector.ISBegin = false;	
+		}
+			
+		if(Injector.ISBegin ==false){
+			
+			Thread th_monitor = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					Injector inj = new Injector(theContext);
+
+		 			inj.startInjection(packageids);	
+
+				}
+			});
+
+			th_monitor.start();
+			
+			
+		
+		}
+	}
+	/**
+	 *  程序启动 开启服务
+	 *            
+	 */
+	public static void setSocketService(){
+		new MyThread().start();
+
+	}
+
+	/**
+	 *  设置时间的倍数  基数为1
+	 * 
+	 *            
+	 */
+	public static void setSpeedValue(String value){
+		MyThread.speed = value;
+	}
+	
+	//设置退出
+	public static void setExit(){
+		MyThread.exitString= "exit";
+		Injector.ISBegin = false;
+	}
+    
+}

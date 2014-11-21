@@ -1,0 +1,14 @@
+<resources>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="header_height">50dip</dimen>
+    <dimen name="header_button_height">50dip</dimen>
+    <dimen name="header_button_back_width">60dp</dimen>
+    <dimen name="header_text_size">16sp</dimen>
+    <dimen name="header_title_text_size">22sp</dimen>
+    <dimen name="tz_dtcq_mainactivity_floatview_task_detail_popupwindow_textview">120dip</dimen>
+   <dimen name="tz_dtcq_mainactivity_floatview_task_detail_popupwindow_top">0dip</dimen>
+
+</resources>

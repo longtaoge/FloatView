@@ -1,0 +1,6 @@
+<resources>
+
+    <dimen name="tz_dtcq_mainactivity_floatview_task_detail_popupwindow_textview">120dip</dimen>
+    <dimen name="tz_dtcq_mainactivity_floatview_task_detail_popupwindow_top">-30dip</dimen>
+
+</resources>

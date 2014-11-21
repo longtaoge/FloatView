@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/tz_dtcq_equip_list_float_window_listview_item_evostr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="蓝色+2"
+        android:textColor="#ffffff" />
+
+    <com.gamedashi.dtcq.floatview.ui.gridview.MyGridView
+    
+        android:id="@+id/tz_dtcq_equip_list_float_window_listview_item_grid"
+        android:layout_width="match_parent"
+    
+        android:layout_height="wrap_content"
+        android:horizontalSpacing="5dip"
+        android:numColumns="6"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="5dip" >
+    </com.gamedashi.dtcq.floatview.ui.gridview.MyGridView>
+
+</LinearLayout>

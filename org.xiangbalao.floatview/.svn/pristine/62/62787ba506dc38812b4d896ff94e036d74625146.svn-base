@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="48.0dip"
+    android:layout_height="48.0dip"
+    android:background="#00ffffff"
+    android:layout_gravity="center_vertical"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/tz_dtcq_gamespeed_float_window_small_quit_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/tz_dtcq_gamespeed_float_window_small_quit_image_icon"
+        android:orientation="vertical" />
+
+</LinearLayout>

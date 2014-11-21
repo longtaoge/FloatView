@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<previews>
+
+    <preview
+        name="Config1"
+        activity="com.gamedashi.dtcq.floatview.view.GamespeedFloatView"
+        config="layout-ldltr-sw384dp-w640dp-h384dp-normal-notlong-land-notnight-xhdpi-finger-keyssoft-nokeys-navhidden-nonav-1280x768-v19"
+        device="Nexus 4"
+        devicestate="Landscape"
+        target="Android 4.4.2"
+        theme="@style/AppTheme" >
+    </preview>
+
+</previews>

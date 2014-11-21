@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="#1E1E1E"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center" >
+
+        <ImageView
+            android:id="@+id/tz_dtcq_equipment_list_dialog_box_float_window_listitem4_griditem_imageView1"
+            android:layout_width="50dip"
+            android:layout_height="50dip"
+            android:padding="0dip"
+            android:src="@drawable/tz_dtcq_equipment_list_dialog_box_float_window_listitem4_griditem_icon" />
+
+        <ImageView
+            android:id="@+id/tz_dtcq_equipment_list_dialog_box_float_window_listitem4_griditem_imageView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/tz_activity_equipment_list_fragment_grid_item_imageview_purple" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tz_dtcq_equipment_list_dialog_box_float_window_listitem4_griditem_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dip"
+        android:text="小黑"
+        android:textSize="12dip" />
+
+</LinearLayout>

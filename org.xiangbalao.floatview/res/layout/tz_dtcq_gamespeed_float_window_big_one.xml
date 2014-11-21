@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tz_dtcq_gamespeed_float_window_big_one_bg"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="#00000000"
+    android:gravity="bottom"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/big_window_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@android:color/transparent"
+        android:gravity="center_horizontal" >
+
+        <LinearLayout
+            android:id="@+id/logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <View
+                android:layout_width="0dip"
+                android:layout_height="fill_parent"
+                android:layout_weight="35"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/tz_dtcq_gamespeed_float_window_big_logo_one_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="5dip"
+                android:background="@drawable/tz_dtcq_float_gamespeed_bg_float_window_logo"
+                android:clickable="true" />
+
+            <View
+                android:layout_width="0dip"
+                android:layout_height="fill_parent"
+                android:layout_weight="65"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/big_window_layout_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/logo"
+            android:layout_below="@id/logo"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:orientation="horizontal" >
+
+            <ImageButton
+                android:id="@+id/tz_dtcq_gamespeed_float_window_big_one_thumbtack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dip"
+                android:background="@drawable/tz_dtcq_gamespeed_bg_float_window_bottom_big_boder"
+                android:src="@drawable/tz_dtcq_float_gamespeed_bg_float_window_thumbtack_up"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/tz_dtcq_gamespeed_float_window_big_linearLayout_center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/tz_dtcq_gamespeed_float_window_big_thumbtack"
+                android:orientation="vertical" >
+
+                <!-- tz_dtcq_gamespeed_bg_float_window_bottom_big_boder -->
+
+                <LinearLayout
+                    android:id="@+id/tz_dtcq_gamespeed_float_window_big_linearLayout1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical" >
+
+                    <ImageView
+                        android:id="@+id/tz_dtcq_gamespeed_float_window_big_sub_one_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@drawable/tz_dtcq_float_gamespeed_bg_float_window_left_1"
+                        android:scaleType="fitXY" />
+
+                    <TextView
+                        android:id="@+id/tz_dtcq_gamespeed_float_window_big_one_textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/tz_dtcq_float_gamespeed_bg_float_window_center_2"
+                        android:gravity="center"
+                        android:text="0.0"
+                        android:textColor="#DF7312" />
+
+                    <ImageButton
+                        android:id="@+id/tz_dtcq_gamespeed_float_window_big_and_one_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/tz_dtcq_float_gamespeed_bg_float_window_right_1" />
+
+                    <ImageButton
+                        android:id="@+id/tz_dtcq_gamespeed_float_window_big_reset_one_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_gravity="center"
+                        android:background="@drawable/tz_dtcq_float_gamespeed_bg_float_window_reset" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/relativeLayout1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal" >
+
+                    <LinearLayout
+                        android:id="@+id/linearLayout1"
+                        android:layout_width="0dip"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:visibility="gone" >
+
+                        <TextView
+                            android:id="@+id/textView1"
+                            android:layout_width="fill_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="5dip"
+                            android:gravity="center_vertical"
+                            android:text="远征一键退出"
+                            android:textColor="#DF7312" />
+                    </LinearLayout>
+
+                    <CheckBox
+                        android:id="@+id/z_dtcq_gamespeed_float_window_big_onekeyexit"
+                        style="@null"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:button="@drawable/tz_dtcq_gamespeed_float_window_big_one_checkbox_styel"
+                        android:text="开" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/tz_dtcq_gamespeed_float_window_big_about_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dip"
+                android:background="@drawable/tz_dtcq_float_gamespeed_bg_float_window_guanyu_1" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</LinearLayout>

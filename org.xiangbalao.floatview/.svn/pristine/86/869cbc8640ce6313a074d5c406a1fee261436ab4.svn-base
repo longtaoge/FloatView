@@ -1,0 +1,183 @@
+package com.gamedashi.dtcq.hookApi;
+
+/**
+ * ZipDownloader
+ * 
+ * A simple app to demonstrate downloading and unpacking a .zip file
+ * as a background task.
+ * 
+ * Copyright (c) 2011 Michael J. Portuesi (http://www.jotabout.com)
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import android.util.Log;
+
+/**
+ * Unpack ZIP file
+ * 
+ * Stolen from:
+ * http://www.jondev.net/articles/Unzipping_Files_with_Android_(Programmatically)
+ *  
+ * fixed to:
+ * 1) ensure cleanup of resources
+ * 2) decompress individual files transactionally
+ * 3) buffered I/O to make it work 10x faster
+ * 
+ * IO Exceptions are rethrown as RuntimeException (not checked).
+ */
+public class DecompressZip {
+	private static final int BUFFER_SIZE=81920;
+
+	private String _zipFile;
+	private String _location;
+	private byte[] _buffer;
+	public String shellNames ;
+	private String _fileBeanPath;
+	public int _type;
+	
+	/**
+	 * Constructor.
+	 * 
+	 * @param zipFile		Fully-qualified path to .zip file
+	 * @param location		Fully-qualified path to folder where files should be written.
+	 * 						Path must have a trailing slash.
+	 */
+	public DecompressZip(String zipFile, String location,String FileBeanPath, int type) {
+		_zipFile = zipFile;
+		_location = location;
+		_buffer = new byte[BUFFER_SIZE];
+		_fileBeanPath= FileBeanPath;
+		_type = type;
+		dirChecker("");
+	}
+
+	public String unzip() {
+		FileInputStream fin = null;
+		ZipInputStream zin = null;
+		OutputStream fout = null;
+		
+		File outputDir = new File(_location);
+		File tmp = null;
+		
+		String off = " ; ";
+		shellNames = "mkdir "+_fileBeanPath+"UI/DOTA-HERO/ "+off;
+		shellNames +=  "mkdir "+_fileBeanPath+"pfca/ "+off;
+		shellNames += "mkdir "+_fileBeanPath+"UI/art/ "+off;
+		shellNames += "chown shell:shell "+_fileBeanPath+"UI/DOTA-HERO "+off;
+		shellNames += "chown shell:shell "+_fileBeanPath+"pfca "+off;
+		shellNames += "chown shell:shell "+_fileBeanPath+"UI/art "+off;
+		shellNames += "chmod 777  "+_fileBeanPath+"UI/DOTA-HERO "+off;;
+		shellNames += "chmod 777 "+_fileBeanPath+"pfca "+off;
+		shellNames += "chmod 777 "+_fileBeanPath+"UI/art "+off;
+		
+		 
+		try {
+			fin = new FileInputStream(_zipFile);
+			zin = new ZipInputStream(fin);
+			ZipEntry ze = null;
+			while ((ze = zin.getNextEntry()) != null) {
+				Log.d("Decompress", "Unzipping " + ze.getName());
+ 				
+				 String tmpName = ze.getName().substring(ze.getName().lastIndexOf(".") + 1, 
+						 ze.getName().length()); 
+				 
+				 if(_type ==1){
+					 if(ze.getName().indexOf("card_bg_big")!= -1){
+							shellNames = shellNames+" cat  "+_location+""+ ze.getName()+" > "+_fileBeanPath+"UI/art/"+ze.getName()+off;
+						}else if(tmpName.equals("fca") ){
+							
+							shellNames = shellNames+" cat  "+_location+""+ ze.getName()+" > "+_fileBeanPath+"pfca/"+ze.getName()+off;
+						
+						}else if(tmpName.equals("jpg")){
+							
+							shellNames = shellNames+" cat  "+_location+""+ ze.getName()+" > "+_fileBeanPath+"UI/DOTA-HERO/"+ze.getName()+off;
+						}
+				 }else {
+					 if(ze.getName().indexOf("card_bg_big")!= -1){
+							shellNames = shellNames+" rm "+_fileBeanPath+"UI/art/"+ze.getName()+off;
+						}else if(tmpName.equals("fca") ){
+							
+							shellNames = shellNames+" rm "+_fileBeanPath+"pfca/"+ze.getName()+off;
+						
+						}else if(tmpName.equals("jpg")){
+							
+							shellNames = shellNames+" rm "+_fileBeanPath+"UI/DOTA-HERO/"+ze.getName()+off;
+						}
+					 
+				 }
+				 
+				
+				
+				if (ze.isDirectory()) {
+					dirChecker(ze.getName());
+				} else {
+					tmp = File.createTempFile( "decomp", ".tmp", outputDir );
+					fout = new BufferedOutputStream(new FileOutputStream(tmp));
+					new DownloadFile().copyStream( zin, fout, _buffer, BUFFER_SIZE );
+					zin.closeEntry();
+					fout.close();
+					fout = null;
+					tmp.renameTo( new File(_location + ze.getName()) );
+					tmp = null; 
+				}
+			}
+			 
+			shellNames += "chmod 777  "+_fileBeanPath+"UI/DOTA-HERO/* "+off;
+			shellNames += "chmod 777 "+_fileBeanPath+"pfca/* "+off;
+			shellNames += "chmod 777 "+_fileBeanPath+"UI/art/*  "+off;
+			
+			shellNames += "chown shell:shell "+_fileBeanPath+"UI/DOTA-HERO/* "+off;
+			shellNames += "chown shell:shell "+_fileBeanPath+"pfca/* "+off;
+			shellNames += "chown shell:shell "+_fileBeanPath+"UI/art/* "+off;
+			shellNames+="exit ";
+			zin.close();
+			
+			zin = null;
+			
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} finally {
+			if ( tmp != null  ) { try { tmp.delete();     } catch (Exception ignore) {;} }
+			if ( fout != null ) { try { fout.close(); 	  } catch (Exception ignore) {;} }
+			if ( zin != null  ) { try { zin.closeEntry(); } catch (Exception ignore) {;} }
+			if ( fin != null  ) { try { fin.close(); 	  } catch (Exception ignore) {;} }
+		}
+		
+		return shellNames;
+ 		
+	}
+
+	private void dirChecker(String dir) {
+		File f = new File(_location + dir);
+
+		if (!f.isDirectory()) {
+			f.mkdirs();
+		}
+	}
+}

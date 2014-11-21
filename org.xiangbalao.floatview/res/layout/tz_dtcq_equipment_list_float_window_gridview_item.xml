@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <ImageView
+        android:id="@+id/tz_dtcq_equipment_list_float_window_gridview_item_icon"
+        android:layout_width="48dip"
+        android:layout_height="48dip"
+        android:layout_gravity="center"
+        
+        android:scaleType="centerInside"
+        android:src="@drawable/tz_dtcq_equip_list_float_window_listview_item_grid_icon" />
+
+    <TextView
+        android:id="@+id/tz_dtcq_equipment_list_float_window_gridview_item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="20dip"
+        android:ems="3"
+        android:singleLine="true"
+        android:text="小树枝"
+        android:textColor="#ffffff" />
+
+</LinearLayout>
